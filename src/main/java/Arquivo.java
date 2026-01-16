@@ -20,6 +20,6 @@ public class Arquivo extends Entrada {
 
     @Override
     public int getTamanho() {
-        return conteudo.length(); // Tamanho em caracteres (bytes simulados)
+        return conteudo.length(); // Tamanho em caracteres (bytes simulados).
     }
 }

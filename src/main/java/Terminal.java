@@ -93,7 +93,7 @@ public class Terminal {
     }
 
     private void cmdCd(String caminho) {
-        // Tratamento para voltar à raiz ou home
+        // Tratamento para voltar à raiz ou home.
         if (caminho == null || caminho.equals("~") || caminho.equals("/")) { // trata a "/"
             diretorioAtual = raiz;
             return;

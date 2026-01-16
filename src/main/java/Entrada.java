@@ -11,7 +11,7 @@ public abstract class Entrada {
         this.nome = nome;
         this.pai = pai;
         this.dataCriacao = LocalDateTime.now();
-        this.permissao = "rwxr-xr-x"; // Permissão padrão
+        this.permissao = "rwxr-xr-x"; // Permissão padrão.
     }
 
     public String getNome() { return nome; }

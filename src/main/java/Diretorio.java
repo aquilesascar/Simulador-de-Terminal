@@ -33,7 +33,7 @@ public class Diretorio extends Entrada {
 
     @Override
     public int getTamanho() {
-        //Tamanho do diretório é a soma do tamanho dos filhos
+        //Tamanho do diretório é a soma do tamanho dos filhos.
         int total = 0;
         for (Entrada e : filhos) {
             total += e.getTamanho();
