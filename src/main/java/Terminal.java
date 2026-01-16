@@ -54,6 +54,18 @@ public class Terminal {
                 case "exit":
                     executando = false;
                     break;
+                case "pwd":
+                    cmdPwd();
+                    break;
+                case "echo":
+                    cmdEcho(argumento);
+                    break;
+                case "cat":
+                    cmdCat(argumento);
+                    break;
+                case "tree":
+                    cmdTree();
+                    break;
                 // Adicionar outros cases aqui...
                 default:
                     System.out.println("Comando não encontrado: " + comando);
@@ -64,6 +76,92 @@ public class Terminal {
     }
 
     // --- Implementação dos Comandos ---
+
+    private void cmdTree() {
+        mostrarArvore(diretorioAtual, "");
+    }
+
+    // Método recursivo auxiliar
+    private void mostrarArvore(Entrada entrada, String prefixo) {
+        System.out.println(prefixo + "|-- " + entrada.getNome());
+
+        if (entrada instanceof Diretorio) {
+            Diretorio dir = (Diretorio) entrada;
+            for (Entrada filho : dir.getFilhos()) {
+                // Chama a si mesmo com um prefixo maior
+                mostrarArvore(filho, prefixo + "    ");
+            }
+        }
+    }
+
+    private void cmdCat(String nome) {
+        Entrada alvo = diretorioAtual.buscarFilho(nome);
+        if (alvo instanceof Arquivo) {
+            System.out.println(((Arquivo) alvo).lerConteudo());
+        } else {
+            System.out.println("Arquivo não encontrado ou é um diretório.");
+        }
+    }
+
+    private void cmdEcho(String linhaComando) {
+        // Exemplo de entrada: echo "Ola Mundo" > arquivo.txt
+
+        // 1. Identificar se é sobrescrita (>) ou append (>>)
+        boolean append = linhaComando.contains(">>");
+        String operador = append ? ">>" : ">";
+
+        // 2. Quebrar a string no operador
+        String[] partes = linhaComando.split(operador);
+        if (partes.length < 2) {
+            System.out.println("Erro. Uso: echo <texto> > <arquivo>");
+            return;
+        }
+
+        // 3. Limpar o texto (remover "echo" e aspas extras)
+        String texto = partes[0].replaceFirst("echo", "").trim();
+        if (texto.startsWith("\"") && texto.endsWith("\"")) {
+            texto = texto.substring(1, texto.length() - 1);
+        }
+
+        String nomeArquivo = partes[1].trim();
+
+        // 4. Buscar ou criar o arquivo
+        Entrada alvo = diretorioAtual.buscarFilho(nomeArquivo);
+        Arquivo arquivo;
+
+        if (alvo == null) {
+            // Se não existe, cria um novo
+            arquivo = new Arquivo(nomeArquivo, diretorioAtual);
+            diretorioAtual.adicionarFilho(arquivo);
+        } else if (alvo instanceof Arquivo) {
+            arquivo = (Arquivo) alvo;
+        } else {
+            System.out.println("Erro: " + nomeArquivo + " é um diretório.");
+            return;
+        }
+
+        // 5. Escrever no arquivo (método que criamos na classe Arquivo)
+        arquivo.escreverConteudo(texto, append);
+        if (append) arquivo.escreverConteudo("\n", true); // Quebra de linha opcional
+    }
+
+    private void cmdPwd() {
+        // Começa do diretório atual e vai subindo até a raiz
+        Diretorio temp = diretorioAtual;
+        String caminho = "";
+
+        // Caso especial: se já estiver na raiz
+        if (temp.getPai() == null) {
+            System.out.println("/");
+            return;
+        }
+
+        while (temp.getPai() != null) {
+            caminho = "/" + temp.getNome() + caminho;
+            temp = temp.getPai();
+        }
+        System.out.println(caminho);
+    }
 
     private void cmdMkdir(String nome) {
         if (nome == null) {
