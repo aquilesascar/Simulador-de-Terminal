@@ -7,7 +7,7 @@ public class Terminal {
 
     public Terminal() {
         // Inicializa o sistema com a raiz "/"
-        this.raiz = new Diretorio("/", null);
+        this.raiz = new Diretorio("", null);
         this.diretorioAtual = raiz;
         this.executando = true;
     }
@@ -42,8 +42,16 @@ public class Terminal {
     }
 
     private void exibirPrompt() {
+        Entrada raiz = this.diretorioAtual;
+        String caminho = raiz.getNome();
+        while(raiz != null) {
+            raiz = raiz.getPai();
+            caminho = raiz !=null ? raiz.getNome() + "/" + caminho : caminho;
+        }
+        caminho = "user@ifmg: "+caminho;
+
         // Dica: Você precisará montar o caminho completo recursivamente para o comando 'pwd'
-        System.out.print("user@ifmg:" + diretorioAtual.getNome() + "$ ");
+        System.out.print(caminho);
     }
 
     private void interpretarComando(String linha) {
@@ -65,12 +73,18 @@ public class Terminal {
                 case "rename":
                     rename(argumento, argumento2);
                     break;
+                case "rm":
+                    rm(argumento);
+                    break;
 
                 case "ls":
                     cmdLs();
                     break;
                 case "cd":
                     cmdCd(argumento);
+                    break;
+                case "...":
+                    tresPontos();
                     break;
                 case "touch":
                     cmdTouch(argumento);
@@ -82,7 +96,7 @@ public class Terminal {
                     cmdPwd();
                     break;
                 case "echo":
-                    cmdEcho(argumento);
+                    cmdEcho(linha);
                     break;
                 case "cat":
                     cmdCat(argumento);
@@ -99,6 +113,28 @@ public class Terminal {
         }
     }
 
+    private void tresPontos() {
+        if(this.diretorioAtual.getPai() == null) {
+            return;
+        }
+        this.diretorioAtual = this.diretorioAtual.getPai();
+    }
+
+    private void rm(String entrada) {
+        if(entrada == null){
+            System.out.println("Use: rm <nome>");
+            return;
+        }
+        Entrada ent =  this.diretorioAtual.buscarFilho(entrada);
+        if(ent == null){
+            System.out.println(entrada + "não encontrado");
+            return;
+        }
+        this.diretorioAtual.removerFilho(ent);
+        System.out.println(entrada + " removido com sucesso");
+
+
+    }
 
 
     private void cmdTree() {
@@ -128,45 +164,61 @@ public class Terminal {
             System.out.println("Arquivo não encontrado ou é um diretório.");
         }
     }
+    private Arquivo buscarCriarArquivo(String nomeArquivo) {
+        Entrada ent =  this.diretorioAtual.buscarFilho(nomeArquivo);
+        if (ent instanceof Arquivo && ent != null) {
+            return (Arquivo) ent;
+        }
+        Arquivo arquivo = new Arquivo(nomeArquivo, this.diretorioAtual);
+        this.diretorioAtual.adicionarFilho(arquivo);
+        System.out.println("Arquivo criado com sucesso.");
+        return arquivo;
+
+    }
 
     private void cmdEcho(String linhaComando) {
-
-        boolean append = linhaComando.contains(">>");
-        String operador = append ? ">>" : ">";
-
-        // 2. Quebrar a string no operador
-        String[] partes = linhaComando.split(operador);
-        if (partes.length < 2) {
-            System.out.println("Erro. Uso: echo <texto> > <arquivo>");
+        linhaComando = linhaComando.replaceFirst("^echo\\s*", "");
+        String operador = "";
+        String [] partes = new String[0];
+        if(linhaComando.contains(">>")){
+            operador = ">>";
+             partes = linhaComando.trim().split(">>");
+        }else if(linhaComando.contains(">")){
+            operador = ">";
+             partes = linhaComando.trim().split(">");
+        }else{
+            System.out.println("Use: echo <texto> >/>> <arquivo>");
             return;
         }
+        String texto = partes[0].trim();
 
-        // 3. Limpar o texto (remover "echo" e aspas extras)
-        String texto = partes[0].replaceFirst("echo", "").trim();
-        if (texto.startsWith("\"") && texto.endsWith("\"")) {
-            texto = texto.substring(1, texto.length() - 1);
-        }
-
-        String nomeArquivo = partes[1].trim();
-
-        // 4. Buscar ou criar o arquivo
-        Entrada alvo = diretorioAtual.buscarFilho(nomeArquivo);
+        String nomeArquivo = partes.length > 1 ? partes[1].trim() : null;
         Arquivo arquivo;
-
-        if (alvo == null) {
-            // Se não existe, cria um novo
-            arquivo = new Arquivo(nomeArquivo, diretorioAtual);
-            diretorioAtual.adicionarFilho(arquivo);
-        } else if (alvo instanceof Arquivo) {
-            arquivo = (Arquivo) alvo;
-        } else {
-            System.out.println("Erro: " + nomeArquivo + " é um diretório.");
+        if (texto.isEmpty() || nomeArquivo == null || nomeArquivo.isEmpty()) {
+            System.out.println("Use: echo <texto> >/>> <arquivo>");
             return;
         }
 
-        // 5. Escrever no arquivo (método que criamos na classe Arquivo)
-        arquivo.escreverConteudo(texto, append);
-        if (append) arquivo.escreverConteudo("\n", true); // Quebra de linha opcional
+
+        switch (operador) {
+            case ">>":
+                arquivo = buscarCriarArquivo(nomeArquivo);
+                arquivo.escreverConteudo(texto);
+
+                break;
+            case ">":
+                arquivo = buscarCriarArquivo(nomeArquivo);
+                arquivo.setConteudo(texto);
+                break;
+
+        }
+
+
+
+
+
+
+
     }
 
     private void cmdPwd() {
