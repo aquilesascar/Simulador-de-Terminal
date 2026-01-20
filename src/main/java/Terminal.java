@@ -7,7 +7,7 @@ public class Terminal {
 
     public Terminal() {
         // Inicializa o sistema com a raiz "/"
-        this.raiz = new Diretorio("/", null);
+        this.raiz = new Diretorio("", null);
         this.diretorioAtual = raiz;
         this.executando = true;
     }
@@ -42,8 +42,16 @@ public class Terminal {
     }
 
     private void exibirPrompt() {
+        Entrada raiz = this.diretorioAtual;
+        String caminho = raiz.getNome();
+        while(raiz != null) {
+            raiz = raiz.getPai();
+            caminho = raiz !=null ? raiz.getNome() + "/" + caminho : caminho;
+        }
+        caminho = "user@ifmg: "+caminho;
+
         // Dica: Você precisará montar o caminho completo recursivamente para o comando 'pwd'
-        System.out.print("user@ifmg:" + diretorioAtual.getNome() + "$ ");
+        System.out.print(caminho);
     }
 
     private void interpretarComando(String linha) {
@@ -52,17 +60,37 @@ public class Terminal {
 
         String comando = partes[0];
         String argumento = partes.length > 1 ? partes[1] : null;
+        String argumento2 = partes.length > 2 ? partes[2] : null;
 
         try {
             switch (comando) {
                 case "mkdir":
                     cmdMkdir(argumento);
                     break;
+                case "rmdir":
+                    rmdir(argumento);
+                    break;
+                case "rename":
+                    rename(argumento, argumento2);
+                    break;
+                case "rm":
+                    rm(argumento);
+                    break;
+                case "head":
+                    head(linha);
+                    break;
+                case "tail":
+                    tail(linha);
+                    break;
+
                 case "ls":
                     cmdLs();
                     break;
                 case "cd":
                     cmdCd(argumento);
+                    break;
+                case "...":
+                    tresPontos();
                     break;
                 case "touch":
                     cmdTouch(argumento);
@@ -74,7 +102,7 @@ public class Terminal {
                     cmdPwd();
                     break;
                 case "echo":
-                    cmdEcho(argumento);
+                    cmdEcho(linha);
                     break;
                 case "cat":
                     cmdCat(argumento);
@@ -82,7 +110,7 @@ public class Terminal {
                 case "tree":
                     cmdTree();
                     break;
-                // Adicionar outros cases aqui...
+
                 default:
                     System.out.println("Comando não encontrado: " + comando);
             }
@@ -91,7 +119,109 @@ public class Terminal {
         }
     }
 
-    // --- Implementação dos Comandos ---
+    private void tail(String linha) {
+        String [] partes = linha.trim().split("\\s+");
+        String arquivo = partes.length > 1 ? partes[1] : null;
+        String numero = partes.length > 2 ? partes[2] : null;
+        if( arquivo == null || numero == null) {
+            System.out.println("Use:  head <arquivo> <n>: ");
+            return;
+        }
+        Entrada ent = this.diretorioAtual.buscarFilho(arquivo);
+        if(ent == null) {
+            System.out.println("Arquivo não encontrado: " + arquivo);
+            return;
+        }
+        if(ent instanceof Arquivo) {
+            try{
+                int num = Integer.parseInt(numero);
+                exibirUltiLinhas(num, (Arquivo) ent);
+            } catch (NumberFormatException e) {
+                throw new RuntimeException(e);
+            }
+
+
+        }else{
+            System.out.println(arquivo + "não é um arquivo");
+            return;
+        }
+    }
+
+    private void exibirUltiLinhas(int num, Arquivo arquivo) {
+        String [] linhas = arquivo.lerConteudo().split("\\r?\\n");
+        if(num>linhas.length) {
+            System.out.println(num +" maior que o número de linhas do arquivo");
+            return;
+        }
+        int inicio = linhas.length - num;
+        for(int i = inicio; i < linhas.length; i++) {
+            System.out.println(linhas[i]);
+        }
+    }
+
+    private void head(String linhaComando) {
+        String [] partes = linhaComando.trim().split("\\s+");
+        String arquivo = partes.length > 1 ? partes[1] : null;
+        String numero = partes.length > 2 ? partes[2] : null;
+        if( arquivo == null || numero == null) {
+            System.out.println("Use:  head <arquivo> <n>: ");
+            return;
+        }
+        Entrada ent = this.diretorioAtual.buscarFilho(arquivo);
+        if(ent == null) {
+            System.out.println("Arquivo não encontrado: " + arquivo);
+            return;
+        }
+        if(ent instanceof Arquivo) {
+            try{
+                int num = Integer.parseInt(numero);
+                exibirPriLinhas(num, (Arquivo) ent);
+            } catch (NumberFormatException e) {
+                throw new RuntimeException(e);
+            }
+
+
+        }else{
+            System.out.println(arquivo + "não é um arquivo");
+            return;
+        }
+
+    }
+
+    private void exibirPriLinhas(int num, Arquivo arquivo) {
+        String [] linhas = arquivo.lerConteudo().split("\\r?\\n");
+        if(num>linhas.length) {
+            num = linhas.length;
+        }
+        for(int i = 0; i < num; i++) {
+            System.out.println(linhas[i]);
+        }
+
+    }
+
+    private void tresPontos() {
+        if(this.diretorioAtual.getPai() == null) {
+            return;
+        }
+        this.diretorioAtual = this.diretorioAtual.getPai();
+    }
+
+    private void rm(String entrada) {
+        if(entrada == null){
+            System.out.println("Use: rm <nome>");
+            return;
+        }
+        Entrada ent =  this.diretorioAtual.buscarFilho(entrada);
+        if(ent == null){
+            System.out.println(entrada + "não encontrado");
+            return;
+        }
+        this.diretorioAtual.removerFilho(ent);
+        System.out.println(entrada + " removido com sucesso");
+
+
+    }
+
 
     private void cmdTree() {
         mostrarArvore(diretorioAtual, "");
@@ -110,6 +240,8 @@ public class Terminal {
         }
     }
 
+
+
     private void cmdCat(String nome) {
         Entrada alvo = diretorioAtual.buscarFilho(nome);
         if (alvo instanceof Arquivo) {
@@ -118,47 +250,61 @@ public class Terminal {
             System.out.println("Arquivo não encontrado ou é um diretório.");
         }
     }
+    private Arquivo buscarCriarArquivo(String nomeArquivo) {
+        Entrada ent =  this.diretorioAtual.buscarFilho(nomeArquivo);
+        if (ent instanceof Arquivo && ent != null) {
+            return (Arquivo) ent;
+        }
+        Arquivo arquivo = new Arquivo(nomeArquivo, this.diretorioAtual);
+        this.diretorioAtual.adicionarFilho(arquivo);
+        System.out.println("Arquivo criado com sucesso.");
+        return arquivo;
+
+    }
 
     private void cmdEcho(String linhaComando) {
-        // Exemplo de entrada: echo "Ola Mundo" > arquivo.txt
-
-        // 1. Identificar se é sobrescrita (>) ou append (>>)
-        boolean append = linhaComando.contains(">>");
-        String operador = append ? ">>" : ">";
-
-        // 2. Quebrar a string no operador
-        String[] partes = linhaComando.split(operador);
-        if (partes.length < 2) {
-            System.out.println("Erro. Uso: echo <texto> > <arquivo>");
+        linhaComando = linhaComando.replaceFirst("^echo\\s*", "");
+        String operador = "";
+        String [] partes = new String[0];
+        if(linhaComando.contains(">>")){
+            operador = ">>";
+             partes = linhaComando.trim().split(">>");
+        }else if(linhaComando.contains(">")){
+            operador = ">";
+             partes = linhaComando.trim().split(">");
+        }else{
+            System.out.println("Use: echo <texto> >/>> <arquivo>");
             return;
         }
+        String texto = partes[0].trim();
 
-        // 3. Limpar o texto (remover "echo" e aspas extras)
-        String texto = partes[0].replaceFirst("echo", "").trim();
-        if (texto.startsWith("\"") && texto.endsWith("\"")) {
-            texto = texto.substring(1, texto.length() - 1);
-        }
-
-        String nomeArquivo = partes[1].trim();
-
-        // 4. Buscar ou criar o arquivo
-        Entrada alvo = diretorioAtual.buscarFilho(nomeArquivo);
+        String nomeArquivo = partes.length > 1 ? partes[1].trim() : null;
         Arquivo arquivo;
-
-        if (alvo == null) {
-            // Se não existe, cria um novo
-            arquivo = new Arquivo(nomeArquivo, diretorioAtual);
-            diretorioAtual.adicionarFilho(arquivo);
-        } else if (alvo instanceof Arquivo) {
-            arquivo = (Arquivo) alvo;
-        } else {
-            System.out.println("Erro: " + nomeArquivo + " é um diretório.");
+        if (texto.isEmpty() || nomeArquivo == null || nomeArquivo.isEmpty()) {
+            System.out.println("Use: echo <texto> >/>> <arquivo>");
             return;
         }
 
-        // 5. Escrever no arquivo (método que criamos na classe Arquivo)
-        arquivo.escreverConteudo(texto, append);
-        if (append) arquivo.escreverConteudo("\n", true); // Quebra de linha opcional
+
+        switch (operador) {
+            case ">>":
+                arquivo = buscarCriarArquivo(nomeArquivo);
+                arquivo.escreverConteudo(texto);
+
+                break;
+            case ">":
+                arquivo = buscarCriarArquivo(nomeArquivo);
+                arquivo.setConteudo(texto);
+                break;
+
+        }
+
+
+
+
+
+
+
     }
 
     private void cmdPwd() {
@@ -191,6 +337,46 @@ public class Terminal {
         }
         Diretorio novoDir = new Diretorio(nome, diretorioAtual);
         diretorioAtual.adicionarFilho(novoDir);
+    }
+    private void rmdir(String diretorio){
+
+        if(diretorio.equals("")){
+            System.out.println(" Use:rmdir <nome>");
+            return;
+        }
+        Entrada ent = diretorioAtual.buscarFilho(diretorio);
+        if (ent == null || ent instanceof Arquivo) {
+            System.out.println("Diretório "+ diretorio + " não encontrado.");
+            return;
+        }
+        Diretorio entDir = (Diretorio) ent;
+        if(ent.getTamanho() != 0 || entDir.getFilhos().size() > 0){
+            System.out.println(diretorio + "não está vazio");
+            return;
+        }
+        diretorioAtual.removerFilho(ent);
+        System.out.println("Diretório removido com sucesso");
+
+
+    }
+
+    private void rename(String nomeAntigo, String novoNome) {
+        if (nomeAntigo == null || novoNome == null) {
+            System.out.println("use: rename <nome antigo> <nome novo nome>");
+            return;
+        }
+        Entrada ent = diretorioAtual.buscarFilho(nomeAntigo);
+        if (ent == null) {
+            System.out.println("Diretório/Arquivo "+ nomeAntigo+ " não encontrado.");
+            return;
+        }
+        Entrada novaEnt = diretorioAtual.buscarFilho(novoNome);
+        if (novaEnt != null) {
+            System.out.println(novoNome + " já existe.");
+            return;
+        }
+        ent.setNome(novoNome);
+        System.out.println("Nome modificado com sucesso");
     }
 
     private void cmdLs() {

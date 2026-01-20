@@ -10,10 +10,12 @@ public class Diretorio extends Entrada {
     }
 
     public void adicionarFilho(Entrada entrada) {
+
         filhos.add(entrada);
     }
 
     public void removerFilho(Entrada entrada) {
+
         filhos.remove(entrada);
     }
 
@@ -28,16 +30,18 @@ public class Diretorio extends Entrada {
     }
 
     public List<Entrada> getFilhos() {
+
         return filhos;
     }
 
     @Override
     public int getTamanho() {
-        //Tamanho do diretório é a soma do tamanho dos filhos.
+
         int total = 0;
         for (Entrada e : filhos) {
             total += e.getTamanho();
         }
         return total;
     }
+
 }

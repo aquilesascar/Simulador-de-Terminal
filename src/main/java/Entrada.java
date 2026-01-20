@@ -1,22 +1,26 @@
 import java.time.LocalDateTime;
 
-// Classe abstrata que serve de base para Arquivos e Diretórios
+
 public abstract class Entrada {
     protected String nome;
-    protected Diretorio pai; // Importante para o comando 'cd ..'
+    protected Diretorio pai;
     protected LocalDateTime dataCriacao;
-    protected String permissao; // Ex: "rwxrwxrwx"
+    protected String permissao;
 
     public Entrada(String nome, Diretorio pai) {
         this.nome = nome;
         this.pai = pai;
         this.dataCriacao = LocalDateTime.now();
-        this.permissao = "rwxr-xr-x"; // Permissão padrão.
+        this.permissao = "rwxr-xr-x";
     }
 
     public String getNome() { return nome; }
     public Diretorio getPai() { return pai; }
 
-    // Método abstrato: cada um calcula seu tamanho de um jeito
+
     public abstract int getTamanho();
+
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
 }

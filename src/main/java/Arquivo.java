@@ -6,12 +6,15 @@ public class Arquivo extends Entrada {
         this.conteudo = new StringBuilder();
     }
 
-    public void escreverConteudo(String texto, boolean append) {
-        if (append) {
-            this.conteudo.append(texto);
-        } else {
-            this.conteudo = new StringBuilder(texto); // Sobrescreve
-        }
+    public void escreverConteudo(String texto) {
+
+            this.conteudo.append(texto+"\n");
+        ;
+
+    }
+
+    public void setConteudo(String conteudo) {
+        this.conteudo = new StringBuilder(conteudo);
     }
 
     public String lerConteudo() {
