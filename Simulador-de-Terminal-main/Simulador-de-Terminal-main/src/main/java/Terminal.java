@@ -76,6 +76,12 @@ public class Terminal {
                 case "rm":
                     rm(argumento);
                     break;
+                case "head":
+                    head(linha);
+                    break;
+                case "tail":
+                    tail(linha);
+                    break;
 
                 case "ls":
                     cmdLs();
@@ -111,6 +117,86 @@ public class Terminal {
         } catch (Exception e) {
             System.out.println("Erro: " + e.getMessage());
         }
+    }
+
+    private void tail(String linha) {
+        String [] partes = linha.trim().split("\\s+");
+        String arquivo = partes.length > 1 ? partes[1] : null;
+        String numero = partes.length > 2 ? partes[2] : null;
+        if( arquivo == null || numero == null) {
+            System.out.println("Use:  head <arquivo> <n>: ");
+            return;
+        }
+        Entrada ent = this.diretorioAtual.buscarFilho(arquivo);
+        if(ent == null) {
+            System.out.println("Arquivo não encontrado: " + arquivo);
+            return;
+        }
+        if(ent instanceof Arquivo) {
+            try{
+                int num = Integer.parseInt(numero);
+                exibirUltiLinhas(num, (Arquivo) ent);
+            } catch (NumberFormatException e) {
+                throw new RuntimeException(e);
+            }
+
+
+        }else{
+            System.out.println(arquivo + "não é um arquivo");
+            return;
+        }
+    }
+
+    private void exibirUltiLinhas(int num, Arquivo arquivo) {
+        String [] linhas = arquivo.lerConteudo().split("\\r?\\n");
+        if(num>linhas.length) {
+            System.out.println(num +" maior que o número de linhas do arquivo");
+            return;
+        }
+        int inicio = linhas.length - num;
+        for(int i = inicio; i < linhas.length; i++) {
+            System.out.println(linhas[i]);
+        }
+    }
+
+    private void head(String linhaComando) {
+        String [] partes = linhaComando.trim().split("\\s+");
+        String arquivo = partes.length > 1 ? partes[1] : null;
+        String numero = partes.length > 2 ? partes[2] : null;
+        if( arquivo == null || numero == null) {
+            System.out.println("Use:  head <arquivo> <n>: ");
+            return;
+        }
+        Entrada ent = this.diretorioAtual.buscarFilho(arquivo);
+        if(ent == null) {
+            System.out.println("Arquivo não encontrado: " + arquivo);
+            return;
+        }
+        if(ent instanceof Arquivo) {
+            try{
+                int num = Integer.parseInt(numero);
+                exibirPriLinhas(num, (Arquivo) ent);
+            } catch (NumberFormatException e) {
+                throw new RuntimeException(e);
+            }
+
+
+        }else{
+            System.out.println(arquivo + "não é um arquivo");
+            return;
+        }
+
+    }
+
+    private void exibirPriLinhas(int num, Arquivo arquivo) {
+        String [] linhas = arquivo.lerConteudo().split("\\r?\\n");
+        if(num>linhas.length) {
+            num = linhas.length;
+        }
+        for(int i = 0; i < num; i++) {
+            System.out.println(linhas[i]);
+        }
+
     }
 
     private void tresPontos() {

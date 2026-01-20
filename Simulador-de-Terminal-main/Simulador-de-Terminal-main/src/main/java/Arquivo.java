@@ -8,7 +8,8 @@ public class Arquivo extends Entrada {
 
     public void escreverConteudo(String texto) {
 
-            this.conteudo.append(texto);
+            this.conteudo.append(texto+"\n");
+        ;
 
     }
 
