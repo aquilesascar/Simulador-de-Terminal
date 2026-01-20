@@ -19,14 +19,14 @@ public class Diretorio extends Entrada {
         filhos.remove(entrada);
     }
 
-    // Busca um arquivo ou subdiretório pelo nome
+    //busca um arquivo ou subdiretório pelo nome
     public Entrada buscarFilho(String nome) {
         for (Entrada e : filhos) {
             if (e.getNome().equals(nome)) {
                 return e;
             }
         }
-        return null; // Não encontrou
+        return null; //não encontrou
     }
 
     public List<Entrada> getFilhos() {
@@ -43,5 +43,4 @@ public class Diretorio extends Entrada {
         }
         return total;
     }
-
 }

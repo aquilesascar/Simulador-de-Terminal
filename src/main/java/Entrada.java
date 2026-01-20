@@ -1,6 +1,5 @@
 import java.time.LocalDateTime;
 
-
 public abstract class Entrada {
     protected String nome;
     protected Diretorio pai;

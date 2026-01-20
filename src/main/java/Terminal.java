@@ -50,7 +50,6 @@ public class Terminal {
         }
         caminho = "user@ifmg: "+caminho;
 
-        // Dica: Você precisará montar o caminho completo recursivamente para o comando 'pwd'
         System.out.print(caminho);
     }
 
@@ -82,7 +81,6 @@ public class Terminal {
                 case "tail":
                     tail(linha);
                     break;
-
                 case "ls":
                     cmdLs();
                     break;
@@ -139,8 +137,6 @@ public class Terminal {
             } catch (NumberFormatException e) {
                 throw new RuntimeException(e);
             }
-
-
         }else{
             System.out.println(arquivo + "não é um arquivo");
             return;
@@ -179,8 +175,6 @@ public class Terminal {
             } catch (NumberFormatException e) {
                 throw new RuntimeException(e);
             }
-
-
         }else{
             System.out.println(arquivo + "não é um arquivo");
             return;
@@ -218,29 +212,24 @@ public class Terminal {
         }
         this.diretorioAtual.removerFilho(ent);
         System.out.println(entrada + " removido com sucesso");
-
-
     }
-
 
     private void cmdTree() {
         mostrarArvore(diretorioAtual, "");
     }
 
-    // Método recursivo auxiliar
+    //método recursivo auxiliar
     private void mostrarArvore(Entrada entrada, String prefixo) {
         System.out.println(prefixo + "|-- " + entrada.getNome());
 
         if (entrada instanceof Diretorio) {
             Diretorio dir = (Diretorio) entrada;
             for (Entrada filho : dir.getFilhos()) {
-                // Chama a si mesmo com um prefixo maior
+                //chama a si mesmo com um prefixo maior
                 mostrarArvore(filho, prefixo + "    ");
             }
         }
     }
-
-
 
     private void cmdCat(String nome) {
         Entrada alvo = diretorioAtual.buscarFilho(nome);
@@ -250,6 +239,7 @@ public class Terminal {
             System.out.println("Arquivo não encontrado ou é um diretório.");
         }
     }
+
     private Arquivo buscarCriarArquivo(String nomeArquivo) {
         Entrada ent =  this.diretorioAtual.buscarFilho(nomeArquivo);
         if (ent instanceof Arquivo && ent != null) {
@@ -259,7 +249,6 @@ public class Terminal {
         this.diretorioAtual.adicionarFilho(arquivo);
         System.out.println("Arquivo criado com sucesso.");
         return arquivo;
-
     }
 
     private void cmdEcho(String linhaComando) {
@@ -285,7 +274,6 @@ public class Terminal {
             return;
         }
 
-
         switch (operador) {
             case ">>":
                 arquivo = buscarCriarArquivo(nomeArquivo);
@@ -296,15 +284,7 @@ public class Terminal {
                 arquivo = buscarCriarArquivo(nomeArquivo);
                 arquivo.setConteudo(texto);
                 break;
-
         }
-
-
-
-
-
-
-
     }
 
     private void cmdPwd() {
@@ -356,8 +336,6 @@ public class Terminal {
         }
         diretorioAtual.removerFilho(ent);
         System.out.println("Diretório removido com sucesso");
-
-
     }
 
     private void rename(String nomeAntigo, String novoNome) {
@@ -393,7 +371,7 @@ public class Terminal {
     }
 
     private void cmdCd(String caminho) {
-        // Tratamento para voltar à raiz ou home.
+        //tratamento para voltar à raiz ou home.
         if (caminho == null || caminho.equals("~") || caminho.equals("/")) { // trata a "/"
             diretorioAtual = raiz;
             return;
@@ -406,7 +384,7 @@ public class Terminal {
             return;
         }
 
-        // Tenta encontrar o diretório filho
+        //tenta encontrar o diretório filho
         Entrada alvo = diretorioAtual.buscarFilho(caminho);
 
         if (alvo == null) {
