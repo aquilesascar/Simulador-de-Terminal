@@ -52,6 +52,7 @@ public class Terminal {
 
         String comando = partes[0];
         String argumento = partes.length > 1 ? partes[1] : null;
+        String argumento2 = partes.length > 2 ? partes[2] : null;
 
         try {
             switch (comando) {
@@ -60,6 +61,10 @@ public class Terminal {
                     break;
                 case "rmdir":
                     rmdir(argumento);
+                    break;
+                case "rename":
+                    rename(argumento, argumento2);
+                    break;
 
                 case "ls":
                     cmdLs();
@@ -202,14 +207,38 @@ public class Terminal {
             return;
         }
         Entrada ent = diretorioAtual.buscarFilho(diretorio);
-        if (ent == null) {
+        if (ent == null || ent instanceof Arquivo) {
             System.out.println("Diretório "+ diretorio + " não encontrado.");
+            return;
+        }
+        Diretorio entDir = (Diretorio) ent;
+        if(ent.getTamanho() != 0 || entDir.getFilhos().size() > 0){
+            System.out.println(diretorio + "não está vazio");
             return;
         }
         diretorioAtual.removerFilho(ent);
         System.out.println("Diretório removido com sucesso");
 
 
+    }
+
+    private void rename(String nomeAntigo, String novoNome) {
+        if (nomeAntigo == null || novoNome == null) {
+            System.out.println("use: rename <nome antigo> <nome novo nome>");
+            return;
+        }
+        Entrada ent = diretorioAtual.buscarFilho(nomeAntigo);
+        if (ent == null) {
+            System.out.println("Diretório/Arquivo "+ nomeAntigo+ " não encontrado.");
+            return;
+        }
+        Entrada novaEnt = diretorioAtual.buscarFilho(novoNome);
+        if (novaEnt != null) {
+            System.out.println(novoNome + " já existe.");
+            return;
+        }
+        ent.setNome(novoNome);
+        System.out.println("Nome modificado com sucesso");
     }
 
     private void cmdLs() {

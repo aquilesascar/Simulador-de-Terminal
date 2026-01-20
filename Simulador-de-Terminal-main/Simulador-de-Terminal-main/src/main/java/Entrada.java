@@ -19,4 +19,8 @@ public abstract class Entrada {
 
 
     public abstract int getTamanho();
+
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
 }
