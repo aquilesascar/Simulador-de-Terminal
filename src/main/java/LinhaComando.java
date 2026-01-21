@@ -41,6 +41,8 @@ public class LinhaComando {
         commandMap.put("pwd", (args, linha) -> navegacaoManager.cmdPwd());
         commandMap.put("..", (args, linha) -> navegacaoManager.tresPontos());
         commandMap.put("...", (args, linha) -> navegacaoManager.tresPontos());
+        commandMap.put("/:", (args, linha) -> navegacaoManager.cmdDiretorioraiz());
+
         
         // Comandos de sistema
         commandMap.put("rename", (args, linha) -> {

@@ -5,6 +5,10 @@ public class NavegacaoManager {
         this.terminal = terminal;
     }
 
+    public void cmdDiretorioraiz(){
+        this.terminal.setDiretorioAtual(this.terminal.getRaiz());
+
+    }
     public void cmdCd(String caminho) {
         //tratamento para voltar à raiz ou home.
         if (caminho == null || caminho.equals("~") || caminho.equals("/")) { // trata a "/"
