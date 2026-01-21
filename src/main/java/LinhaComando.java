@@ -7,6 +7,7 @@ public class LinhaComando {
     private ArquivoManager arquivoManager;
     private DiretorioManager diretorioManager;
     private NavegacaoManager navegacaoManager;
+    private BuscaFiltragemManager buscaFiltragemManager;
     private Map<String, BiConsumer<String[], String>> commandMap;
 
     public LinhaComando(Terminal terminal) {
