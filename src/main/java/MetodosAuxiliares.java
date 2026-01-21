@@ -1,4 +1,5 @@
 public class MetodosAuxiliares {
+    //Calsse para metodos auxiliares
     public static Entrada buscarDiretorio(Entrada raiz, String diretorio) {
         if(raiz.getNome().equals(diretorio)){
             return raiz;
