@@ -59,11 +59,15 @@ public class LinhaComando {
         commandMap.put("du",(args, linha) -> infoArquivosDiretorios.cmdStat(args.length > 1 ? args[1] : null));
 
         //Operações avançadas
-        commandMap.put("cp", (a,l) -> operacoesAvançadas.cmdCp(l));
-        commandMap.put("mv", (a,l) -> operacoesAvançadas.cmdMv(l));
-        commandMap.put("diff", (a,l) -> operacoesAvançadas.cmdDiff(l));
-        commandMap.put("zip", (a,l) -> operacoesAvançadas.cmdZip(l));
-        commandMap.put("unzip", (a,l) -> operacoesAvançadas.cmdUnzip(l));
+        commandMap.put("cp", (args,linha) -> operacoesAvançadas.cmdCp(linha));
+        commandMap.put("mv", (args,linha) -> operacoesAvançadas.cmdMv(linha));
+        commandMap.put("diff", (args,linha) -> operacoesAvançadas.cmdDiff(linha));
+        commandMap.put("zip", (args,linha) -> operacoesAvançadas.cmdZip(linha));
+        commandMap.put("unzip", (args,linha) -> operacoesAvançadas.cmdUnzip(linha));
+
+        //Extras
+
+        commandMap.put("history", (args, linha) -> arquivoManager.cmdHistory());
 
 
 
@@ -80,6 +84,8 @@ public class LinhaComando {
     }
 
     public void interpretarComando(String linhaComando) {
+        terminal.adicionarHistorico(linhaComando);
+
         String[] partes = linhaComando.trim().split("\\s+");
         if (partes.length == 0) return;
 

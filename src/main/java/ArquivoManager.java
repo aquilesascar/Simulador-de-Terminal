@@ -1,4 +1,5 @@
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class ArquivoManager {
     private Terminal terminal;
@@ -201,4 +202,14 @@ public class ArquivoManager {
         ent.setNome(novoNome);
         System.out.println("Nome modificado com sucesso");
     }
+    public void cmdHistory() {
+        List<String> hist = terminal.getHistorico();
+
+        int i = 1;
+        for (String cmd : hist) {
+            System.out.println(i + "  " + cmd);
+            i++;
+        }
+    }
+
 }

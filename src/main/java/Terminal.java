@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class Terminal {
@@ -5,6 +7,7 @@ public class Terminal {
     private Diretorio diretorioAtual;
     private boolean executando;
     private LinhaComando linhaComando;
+    private List<String> historico;
 
     public Terminal() {
         // Inicializa o sistema com a raiz "/"
@@ -12,6 +15,10 @@ public class Terminal {
         this.diretorioAtual = raiz;
         this.executando = true;
         this.linhaComando = new LinhaComando(this);
+        this.historico = new ArrayList<>();
+    }
+    public void adicionarHistorico(String comando){
+        historico.add(comando);
     }
 
     public void iniciar() {
