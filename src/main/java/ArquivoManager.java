@@ -1,3 +1,5 @@
+import java.time.LocalDateTime;
+
 public class ArquivoManager {
     private Terminal terminal;
 
@@ -159,10 +161,13 @@ public class ArquivoManager {
             case ">>":
                 arquivo = buscarCriarArquivo(nomeArquivo);
                 arquivo.escreverConteudo(texto + "\n");
+                arquivo.setDataUltimaModificacao(LocalDateTime.now());
+
                 break;
             case ">":
                 arquivo = buscarCriarArquivo(nomeArquivo);
                 arquivo.setConteudo(texto +"\n");
+                arquivo.setDataUltimaModificacao(LocalDateTime.now());
                 break;
         }
     }

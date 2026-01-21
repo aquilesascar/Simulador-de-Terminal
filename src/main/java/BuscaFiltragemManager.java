@@ -31,4 +31,40 @@ public class BuscaFiltragemManager {
         }
 
     }
+    public void cmdGrep(String linhaComando) {
+        String[] partes = linhaComando.trim().split("\\s+");
+
+        if (partes.length < 3) {
+            System.out.println("Use: grep <termo> <arquivo>");
+            return;
+        }
+
+        String termo = partes[1];
+        String nomeArquivo = partes[2];
+
+        Entrada entrada = terminal.getDiretorioAtual().buscarFilho(nomeArquivo);
+
+        if (entrada == null || !(entrada instanceof Arquivo)) {
+            System.out.println("Arquivo não encontrado: " + nomeArquivo);
+            return;
+        }
+
+        Arquivo arquivo = (Arquivo) entrada;
+        String conteudo = arquivo.lerConteudo();
+
+        String[] linhas = conteudo.split("\\r?\\n");
+        boolean encontrou = false;
+
+        for (int i = 0; i < linhas.length; i++) {
+            if (linhas[i].contains(termo)) {
+                System.out.println((i + 1) + ": " + linhas[i]);
+                encontrou = true;
+            }
+        }
+
+        if (!encontrou) {
+            System.out.println("Nenhuma ocorrência encontrada.");
+        }
+    }
+
 }

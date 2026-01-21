@@ -8,7 +8,9 @@ public class LinhaComando {
     private DiretorioManager diretorioManager;
     private NavegacaoManager navegacaoManager;
     private BuscaFiltragemManager buscaFiltragemManager;
+    private InfoArquivosDiretorios infoArquivosDiretorios;
     private Map<String, BiConsumer<String[], String>> commandMap;
+
 
     public LinhaComando(Terminal terminal) {
         this.terminal = terminal;
@@ -16,6 +18,7 @@ public class LinhaComando {
         this.diretorioManager = new DiretorioManager(terminal);
         this.navegacaoManager = new NavegacaoManager(terminal);
         this.buscaFiltragemManager = new BuscaFiltragemManager(terminal);
+        this.infoArquivosDiretorios = new InfoArquivosDiretorios(terminal);
         initializeCommands();
     }
 
@@ -47,6 +50,11 @@ public class LinhaComando {
 
         //Comando de busca e filtragem
          commandMap.put("find",(args, linha) -> buscaFiltragemManager.cmdFind(linha));
+         commandMap.put("grep",(args, linha) -> buscaFiltragemManager.cmdGrep(linha));
+
+         //Comandos de informações
+        commandMap.put("stat",(args, linha) -> infoArquivosDiretorios.cmdStat(args.length > 1 ? args[1] : null));
+        commandMap.put("du",(args, linha) -> infoArquivosDiretorios.cmdStat(args.length > 1 ? args[1] : null));
 
         
         // Comandos de sistema
