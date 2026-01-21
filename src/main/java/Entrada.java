@@ -40,4 +40,6 @@ public abstract class Entrada {
     public LocalDateTime getDataUltimaModificacao() {
         return dataUltimaModificacao;
     }
+
+
 }

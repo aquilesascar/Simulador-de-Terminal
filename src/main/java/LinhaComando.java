@@ -9,6 +9,7 @@ public class LinhaComando {
     private NavegacaoManager navegacaoManager;
     private BuscaFiltragemManager buscaFiltragemManager;
     private InfoArquivosDiretorios infoArquivosDiretorios;
+    private OperacoesAvançadas operacoesAvançadas;
     private Map<String, BiConsumer<String[], String>> commandMap;
 
 
@@ -19,6 +20,7 @@ public class LinhaComando {
         this.navegacaoManager = new NavegacaoManager(terminal);
         this.buscaFiltragemManager = new BuscaFiltragemManager(terminal);
         this.infoArquivosDiretorios = new InfoArquivosDiretorios(terminal);
+        this.operacoesAvançadas = new OperacoesAvançadas(terminal);
         initializeCommands();
     }
 
@@ -56,7 +58,15 @@ public class LinhaComando {
         commandMap.put("stat",(args, linha) -> infoArquivosDiretorios.cmdStat(args.length > 1 ? args[1] : null));
         commandMap.put("du",(args, linha) -> infoArquivosDiretorios.cmdStat(args.length > 1 ? args[1] : null));
 
-        
+        //Operações avançadas
+        commandMap.put("cp", (a,l) -> operacoesAvançadas.cmdCp(l));
+        commandMap.put("mv", (a,l) -> operacoesAvançadas.cmdMv(l));
+        commandMap.put("diff", (a,l) -> operacoesAvançadas.cmdDiff(l));
+        commandMap.put("zip", (a,l) -> operacoesAvançadas.cmdZip(l));
+        commandMap.put("unzip", (a,l) -> operacoesAvançadas.cmdUnzip(l));
+
+
+
         // Comandos de sistema
         commandMap.put("rename", (args, linha) -> {
             if (args.length > 2) {
