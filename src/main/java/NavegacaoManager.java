@@ -1,7 +1,7 @@
-public class NavigationManager {
+public class NavegacaoManager {
     private Terminal terminal;
 
-    public NavigationManager(Terminal terminal) {
+    public NavegacaoManager(Terminal terminal) {
         this.terminal = terminal;
     }
 

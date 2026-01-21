@@ -6,14 +6,14 @@ public class LinhaComando {
     private Terminal terminal;
     private ArquivoManager arquivoManager;
     private DiretorioManager diretorioManager;
-    private NavigationManager navigationManager;
+    private NavegacaoManager navegacaoManager;
     private Map<String, BiConsumer<String[], String>> commandMap;
 
     public LinhaComando(Terminal terminal) {
         this.terminal = terminal;
         this.arquivoManager = new ArquivoManager(terminal);
         this.diretorioManager = new DiretorioManager(terminal);
-        this.navigationManager = new NavigationManager(terminal);
+        this.navegacaoManager = new NavegacaoManager(terminal);
         initializeCommands();
     }
 
@@ -37,10 +37,10 @@ public class LinhaComando {
         commandMap.put("wc", (args, linha)-> arquivoManager.cmdWc(args.length > 1 ? args[1] : null));
         
         // Comandos de navegação
-        commandMap.put("cd", (args, linha) -> navigationManager.cmdCd(args.length > 1 ? args[1] : null));
-        commandMap.put("pwd", (args, linha) -> navigationManager.cmdPwd());
-        commandMap.put("..", (args, linha) -> navigationManager.tresPontos());
-        commandMap.put("...", (args, linha) -> navigationManager.tresPontos());
+        commandMap.put("cd", (args, linha) -> navegacaoManager.cmdCd(args.length > 1 ? args[1] : null));
+        commandMap.put("pwd", (args, linha) -> navegacaoManager.cmdPwd());
+        commandMap.put("..", (args, linha) -> navegacaoManager.tresPontos());
+        commandMap.put("...", (args, linha) -> navegacaoManager.tresPontos());
         
         // Comandos de sistema
         commandMap.put("rename", (args, linha) -> {
@@ -59,7 +59,7 @@ public class LinhaComando {
         if (partes.length == 0) return;
 
         String comando = partes[0];
-        
+
         try {
             BiConsumer<String[], String> handler = commandMap.get(comando);
             if (handler != null) {

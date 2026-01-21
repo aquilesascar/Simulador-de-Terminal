@@ -158,11 +158,11 @@ public class ArquivoManager {
         switch (operador) {
             case ">>":
                 arquivo = buscarCriarArquivo(nomeArquivo);
-                arquivo.escreverConteudo(texto);
+                arquivo.escreverConteudo(texto + "\n");
                 break;
             case ">":
                 arquivo = buscarCriarArquivo(nomeArquivo);
-                arquivo.setConteudo(texto);
+                arquivo.setConteudo(texto +"\n");
                 break;
         }
     }
