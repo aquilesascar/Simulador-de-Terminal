@@ -17,4 +17,8 @@ public class ArquivoZip extends Arquivo {
     public List<Entrada> getItensCompactados() {
         return itensCompactados;
     }
+
+    public List<Entrada> getConteudoZipado() {
+        return this.itensCompactados;
+    }
 }
