@@ -15,6 +15,7 @@ public class LinhaComando {
         this.arquivoManager = new ArquivoManager(terminal);
         this.diretorioManager = new DiretorioManager(terminal);
         this.navegacaoManager = new NavegacaoManager(terminal);
+        this.buscaFiltragemManager = new BuscaFiltragemManager(terminal);
         initializeCommands();
     }
 
@@ -43,6 +44,9 @@ public class LinhaComando {
         commandMap.put("..", (args, linha) -> navegacaoManager.tresPontos());
         commandMap.put("...", (args, linha) -> navegacaoManager.tresPontos());
         commandMap.put("/:", (args, linha) -> navegacaoManager.cmdDiretorioraiz());
+
+        //Comando de busca e filtragem
+         commandMap.put("find",(args, linha) -> buscaFiltragemManager.cmdFind(linha));
 
         
         // Comandos de sistema
