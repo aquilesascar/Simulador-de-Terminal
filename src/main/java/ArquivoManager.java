@@ -10,7 +10,7 @@ public class ArquivoManager {
 
     public void cmdTouch(String nome) {
         if (nome == null) return;
-        Arquivo novoArq = new Arquivo(nome, terminal.getDiretorioAtual());
+        Arquivo novoArq = new Arquivo(nome, terminal.getDiretorioAtual(), this.terminal.getUsuarioAtual());
         terminal.getDiretorioAtual().adicionarFilho(novoArq);
     }
     public void cmdWc(String arquivo){
@@ -178,7 +178,7 @@ public class ArquivoManager {
         if (ent instanceof Arquivo && ent != null) {
             return (Arquivo) ent;
         }
-        Arquivo arquivo = new Arquivo(nomeArquivo, terminal.getDiretorioAtual());
+        Arquivo arquivo = new Arquivo(nomeArquivo, terminal.getDiretorioAtual(),this.terminal.getUsuarioAtual());
         terminal.getDiretorioAtual().adicionarFilho(arquivo);
         System.out.println("Arquivo criado com sucesso.");
         return arquivo;
@@ -211,5 +211,64 @@ public class ArquivoManager {
             i++;
         }
     }
+    public void cmdChmod(String linhaComando) {
+        String[] partes = linhaComando.trim().split("\\s+");
+
+        if (partes.length != 3) {
+            System.out.println("Uso: chmod <permissao> <nome>");
+            return;
+        }
+
+        String permissao = partes[1];
+        String nome = partes[2];
+
+        if (!permissao.matches("[0-7]{3}")) {
+            System.out.println("Permissão inválida.");
+            return;
+        }
+
+        Entrada entrada = terminal.getDiretorioAtual().buscarFilho(nome);
+
+        if (entrada == null) {
+            System.out.println("Arquivo ou diretório não encontrado.");
+            return;
+        }
+
+        boolean[] dono = MetodosAuxiliares.converterPermissao(permissao);
+
+        entrada.setPermissoes(dono[0], dono[1], dono[2]);
+
+        System.out.println("Permissões alteradas com sucesso.");
+    }
+    public void cmdChown(String linhaComando) {
+        String[] partes = linhaComando.trim().split("\\s+");
+
+        if (partes.length != 3) {
+            System.out.println("Use: chown <proprietario> <nome>");
+            return;
+        }
+
+        String novoProprietario = partes[1];
+        String nome = partes[2];
+
+        Diretorio atual = terminal.getDiretorioAtual();
+        Entrada entrada = atual.buscarFilho(nome);
+
+        if (entrada == null) {
+            System.out.println("Arquivo ou diretório não encontrado.");
+            return;
+        }
+
+        if (!entrada.getProprietario().equals(terminal.getUsuarioAtual())) {
+            System.out.println("Permissão negada.");
+            return;
+        }
+
+        entrada.setProprietario(novoProprietario);
+        System.out.println("Proprietário alterado para " + novoProprietario);
+    }
+
+
+
 
 }

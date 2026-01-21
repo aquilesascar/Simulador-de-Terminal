@@ -4,8 +4,8 @@ import java.util.List;
 public class Diretorio extends Entrada {
     private List<Entrada> filhos;
 
-    public Diretorio(String nome, Diretorio pai) {
-        super(nome, pai);
+    public Diretorio(String nome, Diretorio pai, String proprietario) {
+        super(nome, pai,proprietario);
         this.filhos = new ArrayList<>();
     }
 

@@ -8,17 +8,31 @@ public class Terminal {
     private boolean executando;
     private LinhaComando linhaComando;
     private List<String> historico;
+    private String usuarioAtual;
 
     public Terminal() {
         // Inicializa o sistema com a raiz "/"
-        this.raiz = new Diretorio("", null);
+        this.raiz = new Diretorio("", null, this.getUsuarioAtual());
         this.diretorioAtual = raiz;
         this.executando = true;
         this.linhaComando = new LinhaComando(this);
         this.historico = new ArrayList<>();
+        this.usuarioAtual = "aluno";
     }
     public void adicionarHistorico(String comando){
         historico.add(comando);
+    }
+
+    public String getUsuarioAtual() {
+        return usuarioAtual;
+    }
+
+    public void setUsuarioAtual(String usuarioAtual) {
+        this.usuarioAtual = usuarioAtual;
+    }
+
+    public List<String> getHistorico() {
+        return historico;
     }
 
     public void iniciar() {
@@ -27,15 +41,16 @@ public class Terminal {
         System.out.println("\u001B[32m");    // Muda texto para VERDE (Estilo Hacker)
 
         // Imprime um Banner em ASCII
-        System.out.println(" ░▒▓███████▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓████████▓▒░▒▓█▓▒░      ░▒▓█▓▒░             ░▒▓█▓▒░▒▓████████▓▒░▒▓██████████████▓▒░ ░▒▓██████▓▒░  \n" +
-                "░▒▓█▓▒░      ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░      ░▒▓█▓▒░      ░▒▓█▓▒░             ░▒▓█▓▒░▒▓█▓▒极      ░▒▓█▓▒░░▒▓█▓▒极░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░ \n" +
-                "░▒▓█▓▒░      ░▒▓█▓▒极░░▒▓█▓▒░▒▓█▓▒░      ░▒▓█▓▒░      ░▒▓█▓▒░             ░▒▓█▓▒░▒▓█▓▒░      ░▒▓█▓▒极░░▒▓█▓▒极░░▒▓█▓▒░▒▓█▓▒░        \n" +
-                " ░▒▓██████▓▒░░▒▓████████▓▒░▒▓██████▓▒░ ░▒▓█▓▒░      ░▒▓█▓▒░             ░▒▓█▓▒░▒▓██████▓▒░ ░▒▓█▓▒极░░▒▓█▓▒极░░▒▓█▓▒░▒▓█▓▒▒▓███▓▒░ \n" +
-                "       ░▒▓█▓▒░▒▓█▓▒极░░▒▓█▓▒░▒▓极█▓▒░      ░▒▓█▓▒░      ░▒▓█极▓▒░             ░▒▓█▓▒░▒▓█▓▒░      ░▒▓█▓▒极░░▒▓█▓▒极░░▒▓█▓▒░▒▓█▓▒极░░▒▓█▓▒░ \n" +
-                "       ░▒▓█▓▒░▒▓█▓▒极░░▒▓█▓▒░▒▓█▓▒░      ░▒▓█▓▒░      ░▒▓█▓▒░             ░▒▓█▓▒░▒▓█▓▒极      ░▒▓█▓▒极░░▒▓█▓▒极░░▒▓█极▓▒░▒▓█▓▒极░░▒▓█▓▒░ \n" +
-                "░▒▓███████▓▒极░░▒▓█▓▒极░░▒▓█▓▒░▒▓████████▓▒░▒▓████████▓▒░▒▓████████▓▒极      ░▒▓█▓▒░▒极▓█▓▒极      ░▒▓█▓▒极░░▒▓█▓▒极░░▒▓█▓▒极░░▒▓██████▓▒极  \n" +
+        System.out.println(" " +
+                " ░▒▓███████▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓████████▓▒░▒▓█▓▒░      ░▒▓█▓▒░             ░▒▓█▓▒░▒▓████████▓▒░▒▓██████████████▓▒░ ░▒▓██████▓▒░  \n" +
+                "░▒▓█▓▒░      ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░      ░▒▓█▓▒░      ░▒▓█▓▒░             ░▒▓█▓▒░▒▓█▓▒░      ░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░ \n" +
+                "░▒▓█▓▒░      ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░      ░▒▓█▓▒░      ░▒▓█▓▒░             ░▒▓█▓▒░▒▓█▓▒░      ░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░        \n" +
+                " ░▒▓██████▓▒░░▒▓████████▓▒░▒▓██████▓▒░ ░▒▓█▓▒░      ░▒▓█▓▒░             ░▒▓█▓▒░▒▓██████▓▒░ ░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒▒▓███▓▒░ \n" +
+                "       ░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░      ░▒▓█▓▒░      ░▒▓█▓▒░             ░▒▓█▓▒░▒▓█▓▒░      ░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░ \n" +
+                "       ░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░      ░▒▓█▓▒░      ░▒▓█▓▒░             ░▒▓█▓▒░▒▓█▓▒░      ░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░ \n" +
+                "░▒▓███████▓▒░░▒▓█▓▒░░▒▓█▓▒░▒▓████████▓▒░▒▓████████▓▒░▒▓████████▓▒░      ░▒▓█▓▒░▒▓█▓▒░      ░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░░▒▓██████▓▒░  \n" +
                 "                                                                                                                              \n" +
-                "                                                                                                                              ");
+                "                                                                                                                               ");
         System.out.println("      SISTEMA DE ARQUIVOS VIRTUAL - IFMG - SO 2026           ");
         System.out.println("_____________________________________________________________\n");
         Scanner scanner = new Scanner(System.in);
@@ -57,7 +72,7 @@ public class Terminal {
             raiz = raiz.getPai();
             caminho = raiz !=null ? raiz.getNome() + "/" + caminho : caminho;
         }
-        caminho = "user@ifmg: "+ caminho;
+        caminho = "user@ifmg: "+ caminho + " ";
 
         System.out.print(caminho);
     }

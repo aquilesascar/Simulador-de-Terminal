@@ -5,8 +5,8 @@ public class ArquivoZip extends Arquivo {
 
     private List<Entrada> itensCompactados;
 
-    public ArquivoZip(String nome, Diretorio pai) {
-        super(nome, pai);
+    public ArquivoZip(String nome, Diretorio pai, String proprietario) {
+        super(nome, pai, proprietario);
         this.itensCompactados = new ArrayList<>();
     }
 

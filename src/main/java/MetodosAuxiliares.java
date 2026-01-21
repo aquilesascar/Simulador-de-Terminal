@@ -30,7 +30,7 @@ public class MetodosAuxiliares {
         if (origem instanceof Arquivo) {
             Arquivo arqOrig = (Arquivo) origem;
 
-            Arquivo copia = new Arquivo(arqOrig.getNome(), novoPai);
+            Arquivo copia = new Arquivo(arqOrig.getNome(), novoPai, arqOrig.getProprietario());
             copia.setConteudo(arqOrig.lerConteudo());
 
             return copia;
@@ -40,7 +40,7 @@ public class MetodosAuxiliares {
         if (origem instanceof Diretorio) {
             Diretorio dirOrig = (Diretorio) origem;
 
-            Diretorio copiaDir = new Diretorio(dirOrig.getNome(), novoPai);
+            Diretorio copiaDir = new Diretorio(dirOrig.getNome(), novoPai, dirOrig.getProprietario());
 
             for (Entrada filho : dirOrig.getFilhos()) {
                 Entrada copiaFilho = copiarEntrada(filho, copiaDir);
@@ -52,4 +52,15 @@ public class MetodosAuxiliares {
 
         return null;
     }
+    public static boolean[] converterPermissao(String perm) {
+        boolean[] p = new boolean[3];
+
+        int valor = Character.getNumericValue(perm.charAt(0));
+        p[0] = (valor & 4) != 0; // leitura
+        p[1] = (valor & 2) != 0; // escrita
+        p[2] = (valor & 1) != 0; // execução
+
+        return p;
+    }
+
 }

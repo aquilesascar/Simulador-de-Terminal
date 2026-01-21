@@ -69,6 +69,19 @@ public class LinhaComando {
 
         commandMap.put("history", (args, linha) -> arquivoManager.cmdHistory());
 
+        //Permissoes
+        commandMap.put("chmod", (args, linha) -> arquivoManager.cmdChmod(linha));
+        commandMap.put("chown", (args, linha) -> arquivoManager.cmdChown(linha));
+        commandMap.put("ls", (args, linha) -> {
+            if (args.length > 1 && args[1].equals("-l")) {
+                diretorioManager.cmdLsLongo();
+            } else {
+                diretorioManager.cmdLs();
+            }
+        });
+
+
+
 
 
         // Comandos de sistema

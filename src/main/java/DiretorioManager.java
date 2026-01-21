@@ -15,7 +15,7 @@ public class DiretorioManager {
             System.out.println("Erro: O arquivo/diretório já existe.");
             return;
         }
-        Diretorio novoDir = new Diretorio(nome, terminal.getDiretorioAtual());
+        Diretorio novoDir = new Diretorio(nome, terminal.getDiretorioAtual(), this.terminal.getUsuarioAtual());
         terminal.getDiretorioAtual().adicionarFilho(novoDir);
     }
 
@@ -37,6 +37,28 @@ public class DiretorioManager {
         terminal.getDiretorioAtual().removerFilho(ent);
         System.out.println("Diretório removido com sucesso");
     }
+    public void cmdLsLongo() {
+        Diretorio atual = terminal.getDiretorioAtual();
+
+        for (Entrada e : atual.getFilhos()) {
+
+            String tipo = e instanceof Diretorio ? "d" : "-";
+            String permissoes = e.getPermissoes();
+            String dono = e.getProprietario();
+            int tamanho = e.getTamanho();
+            String nome = e.getNome();
+
+            System.out.printf(
+                    "%s%s %-8s %5d %s%n",
+                    tipo,
+                    permissoes,
+                    dono,
+                    tamanho,
+                    nome
+            );
+        }
+    }
+
 
     public void cmdLs() {
         for (Entrada e : terminal.getDiretorioAtual().getFilhos()) {

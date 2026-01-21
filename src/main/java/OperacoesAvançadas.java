@@ -96,7 +96,7 @@ public class OperacoesAvançadas {
         }
 
         Diretorio atual = terminal.getDiretorioAtual();
-        ArquivoZip zip = new ArquivoZip(partes[1], atual);
+        ArquivoZip zip = new ArquivoZip(partes[1], atual, this.terminal.getUsuarioAtual());
 
         for (int i = 2; i < partes.length; i++) {
             Entrada e = atual.buscarFilho(partes[i]);
