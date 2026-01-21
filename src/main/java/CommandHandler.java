@@ -1,0 +1,79 @@
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.BiConsumer;
+
+public class CommandHandler {
+    private Terminal terminal;
+    private ArquivoManager arquivoManager;
+    private DiretorioManager direotioManager;
+    private NavegacaoManager navegacaoManager;
+    private BuscaFiltragemManager buscaFiltragemManager;
+    private Map<String, BiConsumer<String[], String>> commandMap;
+
+    public CommandHandler(Terminal terminal) {
+        this.terminal = terminal;
+        this.arquivoManager = new ArquivoManager(terminal);
+        this.direotioManager = new DiretorioManager(terminal);
+        this.navegacaoManager = new NavegacaoManager(terminal);
+        this.buscaFiltragemManager = new BuscaFiltragemManager(terminal);
+
+        initializeCommands();
+    }
+
+    private void initializeCommands() {
+        commandMap = new HashMap<>();
+        
+        // Comandos de diretório
+        commandMap.put("mkdir", (args, linha) -> direotioManager.cmdMkdir(args.length > 1 ? args[1] : null));
+        commandMap.put("rmdir", (args, linha) -> direotioManager.rmdir(args.length > 1 ? args[1] : null));
+        commandMap.put("ls", (args, linha) -> direotioManager.cmdLs());
+        commandMap.put("tree", (args, linha) -> direotioManager.cmdTree());
+        
+        // Comandos de arquivo
+        commandMap.put("touch", (args, linha) -> arquivoManager.cmdTouch(args.length > 1 ? args[1] : null));
+        commandMap.put("rm", (args, linha) -> arquivoManager.rm(args.length > 1 ? args[1] : null));
+        commandMap.put("cat", (args, linha) -> arquivoManager.cmdCat(args.length > 1 ? args[1] : null));
+        commandMap.put("head", (args, linha) -> arquivoManager.head(linha));
+        commandMap.put("tail", (args, linha) -> arquivoManager.tail(linha));
+        commandMap.put("echo", (args, linha) -> arquivoManager.cmdEcho(linha));
+        
+        // Comandos de navegação
+        commandMap.put("cd", (args, linha) -> navegacaoManager.cmdCd(args.length > 1 ? args[1] : null));
+        commandMap.put("pwd", (args, linha) -> navegacaoManager.cmdPwd());
+        commandMap.put("..", (args, linha) -> navegacaoManager.tresPontos());
+        commandMap.put("...", (args, linha) -> navegacaoManager.tresPontos());
+
+        //Comandos de busca e filtragem
+        commandMap.put("find", (args, linha) -> buscaFiltragemManager.cmdFind(linha));
+        commandMap.put("grep", (args, linha) -> buscaFiltragemManager.cmdGrep(linha));
+        
+        // Comandos de sistema
+        commandMap.put("rename", (args, linha) -> {
+            if (args.length > 2) {
+                arquivoManager.rename(args[1], args[2]);
+            } else {
+                System.out.println("use: rename <nome antigo> <nome novo>");
+            }
+        });
+        
+        commandMap.put("exit", (args, linha) -> terminal.setExecutando(false));
+    }
+
+    public void interpretarComando(String linhaComando) {
+        String[] partes = linhaComando.trim().split("\\s+");
+        if (partes.length == 0) return;
+
+        String comando = partes[0];
+        
+        try {
+            BiConsumer<String[], String> handler = commandMap.get(comando);
+            if (handler != null) {
+                handler.accept(partes, linhaComando);
+            } else {
+                System.out.println("Comando não encontrado: " + comando);
+            }
+        } catch (Exception e) {
+            System.out.println("Erro: " + e.getMessage());
+        }
+    }
+}

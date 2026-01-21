@@ -1,0 +1,274 @@
+import java.time.LocalDateTime;
+import java.util.List;
+
+public class ArquivoManager {
+    private Terminal terminal;
+
+    public ArquivoManager(Terminal terminal) {
+        this.terminal = terminal;
+    }
+
+    public void cmdTouch(String nome) {
+        if (nome == null) return;
+        Arquivo novoArq = new Arquivo(nome, terminal.getDiretorioAtual(), this.terminal.getUsuarioAtual());
+        terminal.getDiretorioAtual().adicionarFilho(novoArq);
+    }
+    public void cmdWc(String arquivo){
+        if (arquivo == null) return;
+        Entrada ent =  terminal.getDiretorioAtual().buscarFilho(arquivo);
+        if (ent == null) {
+            System.out.println("Arquivo não encontrado");
+            return;
+        }
+        if(ent instanceof Arquivo){
+
+            Arquivo arq = (Arquivo) ent;
+            String conteudo = arq.lerConteudo().toString();
+            String []linhas = conteudo.split("\\r?\\n");
+            int numLinhas = linhas.length;
+            String [] palavras =  conteudo.split("\\s+");
+            int numPalavras = palavras.length;
+            int caracteres =  conteudo.length();
+
+            System.out.println("Numero de linhas: " + numLinhas);
+            System.out.println("Numero de palavras: " + numPalavras);
+            System.out.println("Numero de caracteres: " + caracteres);
+
+        }
+
+    }
+
+    public void rm(String entrada) {
+        if(entrada == null){
+            System.out.println("Use: rm <nome>");
+            return;
+        }
+        Entrada ent =  terminal.getDiretorioAtual().buscarFilho(entrada);
+        if(ent == null){
+            System.out.println(entrada + "não encontrado");
+            return;
+        }
+        terminal.getDiretorioAtual().removerFilho(ent);
+        System.out.println(entrada + " removido com sucesso");
+    }
+
+    public void cmdCat(String nome) {
+        Entrada alvo = terminal.getDiretorioAtual().buscarFilho(nome);
+        if (alvo instanceof Arquivo) {
+            System.out.println(((Arquivo) alvo).lerConteudo());
+        } else {
+            System.out.println("Arquivo não encontrado ou é um diretório.");
+        }
+    }
+
+    public void head(String linhaComando) {
+        String [] partes = linhaComando.trim().split("\\s+");
+        String arquivo = partes.length > 1 ? partes[1] : null;
+        String numero = partes.length > 2 ? partes[2] : null;
+        if( arquivo == null || numero == null) {
+            System.out.println("Use:  head <arquivo> <n>: ");
+            return;
+        }
+        Entrada ent = terminal.getDiretorioAtual().buscarFilho(arquivo);
+        if(ent == null) {
+            System.out.println("Arquivo não encontrado: " + arquivo);
+            return;
+        }
+        if(ent instanceof Arquivo) {
+            try{
+                int num = Integer.parseInt(numero);
+                exibirPriLinhas(num, (Arquivo) ent);
+            } catch (NumberFormatException e) {
+                throw new RuntimeException(e);
+            }
+        }else{
+            System.out.println(arquivo + "não é um arquivo");
+            return;
+        }
+    }
+
+    private void exibirPriLinhas(int num, Arquivo arquivo) {
+        String [] linhas = arquivo.lerConteudo().split("\\r?\\n");
+        if(num>linhas.length) {
+            num = linhas.length;
+        }
+        for(int i = 0; i < num; i++) {
+            System.out.println(linhas[i]);
+        }
+    }
+
+    public void tail(String linha) {
+        String [] partes = linha.trim().split("\\s+");
+        String arquivo = partes.length > 1 ? partes[1] : null;
+        String numero = partes.length > 2 ? partes[2] : null;
+        if( arquivo == null || numero == null) {
+            System.out.println("Use:  head <arquivo> <n>: ");
+            return;
+        }
+        Entrada ent = terminal.getDiretorioAtual().buscarFilho(arquivo);
+        if(ent == null) {
+            System.out.println("Arquivo não encontrado: " + arquivo);
+            return;
+        }
+        if(ent instanceof Arquivo) {
+            try{
+                int num = Integer.parseInt(numero);
+                exibirUltiLinhas(num, (Arquivo) ent);
+            } catch (NumberFormatException e) {
+                throw new RuntimeException(e);
+            }
+        }else{
+            System.out.println(arquivo + "não é um arquivo");
+            return;
+        }
+    }
+
+    private void exibirUltiLinhas(int num, Arquivo arquivo) {
+        String [] linhas = arquivo.lerConteudo().split("\\r?\\n");
+        if(num>linhas.length) {
+            System.out.println(num +" maior que o número de linhas do arquivo");
+            return;
+        }
+        int inicio = linhas.length - num;
+        for(int i = inicio; i < linhas.length; i++) {
+            System.out.println(linhas[i]);
+        }
+    }
+
+    public void cmdEcho(String linhaComando) {
+        linhaComando = linhaComando.replaceFirst("^echo\\s*", "");
+        String operador = "";
+        String [] partes = new String[0];
+        if(linhaComando.contains(">>")){
+            operador = ">>";
+             partes = linhaComando.trim().split(">>");
+        }else if(linhaComando.contains(">")){
+            operador = ">";
+             partes = linhaComando.trim().split(">");
+        }else{
+            System.out.println("Use: echo <texto> >/>> <arquivo>");
+            return;
+        }
+        String texto = partes[0].trim();
+
+        String nomeArquivo = partes.length > 1 ? partes[1].trim() : null;
+        Arquivo arquivo;
+        if (texto.isEmpty() || nomeArquivo == null || nomeArquivo.isEmpty()) {
+            System.out.println("Use: echo <texto> >/>> <arquivo>");
+            return;
+        }
+
+        switch (operador) {
+            case ">>":
+                arquivo = buscarCriarArquivo(nomeArquivo);
+                arquivo.escreverConteudo(texto + "\n");
+                arquivo.setDataUltimaModificacao(LocalDateTime.now());
+
+                break;
+            case ">":
+                arquivo = buscarCriarArquivo(nomeArquivo);
+                arquivo.setConteudo(texto +"\n");
+                arquivo.setDataUltimaModificacao(LocalDateTime.now());
+                break;
+        }
+    }
+
+    private Arquivo buscarCriarArquivo(String nomeArquivo) {
+        Entrada ent =  terminal.getDiretorioAtual().buscarFilho(nomeArquivo);
+        if (ent instanceof Arquivo && ent != null) {
+            return (Arquivo) ent;
+        }
+        Arquivo arquivo = new Arquivo(nomeArquivo, terminal.getDiretorioAtual(),this.terminal.getUsuarioAtual());
+        terminal.getDiretorioAtual().adicionarFilho(arquivo);
+        System.out.println("Arquivo criado com sucesso.");
+        return arquivo;
+    }
+
+    public void rename(String nomeAntigo, String novoNome) {
+        if (nomeAntigo == null || novoNome == null) {
+            System.out.println("use: rename <nome antigo> <nome novo nome>");
+            return;
+        }
+        Entrada ent = terminal.getDiretorioAtual().buscarFilho(nomeAntigo);
+        if (ent == null) {
+            System.out.println("Diretório/Arquivo "+ nomeAntigo+ " não encontrado.");
+            return;
+        }
+        Entrada novaEnt = terminal.getDiretorioAtual().buscarFilho(novoNome);
+        if (novaEnt != null) {
+            System.out.println(novoNome + " já existe.");
+            return;
+        }
+        ent.setNome(novoNome);
+        System.out.println("Nome modificado com sucesso");
+    }
+    public void cmdHistory() {
+        List<String> hist = terminal.getHistorico();
+
+        int i = 1;
+        for (String cmd : hist) {
+            System.out.println(i + "  " + cmd);
+            i++;
+        }
+    }
+    public void cmdChmod(String linhaComando) {
+        String[] partes = linhaComando.trim().split("\\s+");
+
+        if (partes.length != 3) {
+            System.out.println("Uso: chmod <permissao> <nome>");
+            return;
+        }
+
+        String permissao = partes[1];
+        String nome = partes[2];
+
+        if (!permissao.matches("[0-7]{3}")) {
+            System.out.println("Permissão inválida.");
+            return;
+        }
+
+        Entrada entrada = terminal.getDiretorioAtual().buscarFilho(nome);
+
+        if (entrada == null) {
+            System.out.println("Arquivo ou diretório não encontrado.");
+            return;
+        }
+
+        boolean[] dono = MetodosAuxiliares.converterPermissao(permissao);
+
+        entrada.setPermissoes(dono[0], dono[1], dono[2]);
+
+        System.out.println("Permissões alteradas com sucesso.");
+    }
+    public void cmdChown(String linhaComando) {
+        String[] partes = linhaComando.trim().split("\\s+");
+
+        if (partes.length != 3) {
+            System.out.println("Use: chown <proprietario> <nome>");
+            return;
+        }
+
+        String novoProprietario = partes[1];
+        String nome = partes[2];
+
+        Diretorio atual = terminal.getDiretorioAtual();
+        Entrada entrada = atual.buscarFilho(nome);
+
+        if (entrada == null) {
+            System.out.println("Arquivo ou diretório não encontrado.");
+            return;
+        }
+
+        if (!entrada.getProprietario().equals(terminal.getUsuarioAtual())) {
+            System.out.println("Permissão negada.");
+            return;
+        }
+
+        entrada.setProprietario(novoProprietario);
+        System.out.println("Proprietário alterado para " + novoProprietario);
+    }
+
+
+
+
+}
